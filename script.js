@@ -15,14 +15,14 @@ function Cell (){
 }
 
 /**
- * Gameboard that uses the IIFE model for encapsulation and to allow only one instance to be created
- * Gameboard maintains a double array of Cell objects which represents the board. 
- * Gameboard allows the user to place a token 
- * Gameboard allows the user to print the gameboard
- * Gameboard checks lines to find if there is three in a row
+ * GameBoard that uses the IIFE model for encapsulation and to allow only one instance to be created
+ * GameBoard maintains a double array of Cell objects which represents the board. 
+ * GameBoard allows the user to place a token 
+ * GameBoard allows the user to print the GameBoard
+ * GameBoard checks lines to find if there is three in a row
  */
 
-const Gameboard = (function() {
+const GameBoard = (function() {
     const rows = 3;
     const cols = 3;
     const board = [];
@@ -162,7 +162,7 @@ const Player = function(playerName, playerToken) {
  */
 const GameController = (function() {
 
-    //const board = Gameboard.getBoard();
+    //const board = GameBoard.getBoard();
 
     const players = [];
     const tokens = [1, 2];
@@ -186,8 +186,8 @@ const GameController = (function() {
         activePlayer = players[0];
 
         console.log(`New game: ${players[0].getPlayerName()} vs ${players[1].getPlayerName()}`)
-        Gameboard.reset();
-        Gameboard.print();
+        GameBoard.reset();
+        GameBoard.print();
     };
 
     const playRound = (row, col) => {
@@ -196,11 +196,11 @@ const GameController = (function() {
         }
         else {
             console.log(`Player ${activePlayer.getPlayerName()} makes their move!`);
-            Gameboard.placeToken(row, col, activePlayer.getPlayerToken());
-            Gameboard.print();
+            GameBoard.placeToken(row, col, activePlayer.getPlayerToken());
+            GameBoard.print();
 
             //check lines to see if there is three in a row
-            const result = Gameboard.checkLines(row, col, activePlayer.getPlayerToken());
+            const result = GameBoard.checkLines(row, col, activePlayer.getPlayerToken());
 
             //active player won
             if(result === true){
@@ -210,7 +210,7 @@ const GameController = (function() {
             }
 
             //no more empty cells and no winner so it's a draw
-            if(Gameboard.hasEmptyCells() === false){
+            if(GameBoard.hasEmptyCells() === false){
                 console.log("It's a draw!");
                 reset();
                 return;
@@ -221,7 +221,7 @@ const GameController = (function() {
     };
 
     const reset = () => {
-        Gameboard.reset();
+        GameBoard.reset();
         players = [];
         activePlayer = null;
     }
@@ -235,9 +235,27 @@ const GameController = (function() {
 
 //dom rendering object
 //player interacting with dom 
-/*const ScreenController = (function() {
+const ScreenController = (function() {
+    //let's hard code this for now
+    GameController.startNewGame("X", "O");
+    
+    //create the cells
+    //style the cells
+    //event listener for each cell
+    const updateDisplay = () =>{
+        //get the latest version of the board
+        const board = GameBoard.getBoard();
+    }
 
-})();*/
+    //event listeners for cells
+    function clickHandlerCell(e) {
 
-GameController.startNewGame("Joe", "Bob");
-GameController.playRound(1, 2);
+    }
+    //event lister for button
+
+    function clickHandlerPlayBtn(e) {
+
+    }
+
+    updateDisplay();
+})();

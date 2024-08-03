@@ -3,3 +3,45 @@
     padding: 0;
     box-sizing: border-box;
 }
+
+body{
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+}
+
+.container{
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.header {
+    display: flex;
+    justify-content: center;
+}
+
+.board{
+    border-style: solid;
+    height: 600px;
+    width: 600px;
+}
+
+.gameControls{
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    gap: 20px
+}
+
+.message{
+
+}
+
+button{
+
+}
+
