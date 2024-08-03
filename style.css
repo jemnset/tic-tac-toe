@@ -27,6 +27,15 @@ body{
     border-style: solid;
     height: 600px;
     width: 600px;
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+}
+
+.cell {
+    background-color: white;
+    /* rgb(227, 59, 128) -pink
+     * rgb(109, 178, 243) -blue
+     */
 }
 
 .gameControls{

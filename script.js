@@ -121,9 +121,9 @@ const GameBoard = (function() {
     //check to see if there are any more empty spaces on the board to play
     const hasEmptyCells = () => {
         const emptyCells = board.filter((row) => {
-            row.filter((cell) => {
-                cell.getValue() === 0;
-            });
+            return row
+                    .filter((cell) => cell.getValue() === 0)
+                    .length > 0;
         });
 
         return emptyCells.length > 0;
@@ -162,9 +162,7 @@ const Player = function(playerName, playerToken) {
  */
 const GameController = (function() {
 
-    //const board = GameBoard.getBoard();
-
-    const players = [];
+    let players = [];
     const tokens = [1, 2];
     let activePlayer = null;
     
@@ -236,8 +234,10 @@ const GameController = (function() {
 //dom rendering object
 //player interacting with dom 
 const ScreenController = (function() {
-    //let's hard code this for now
+    //hard code this for now
     GameController.startNewGame("X", "O");
+    const boardElement = document.querySelector(".board");
+    const messageElement = document.querySelector(".message");
     
     //create the cells
     //style the cells
@@ -245,17 +245,51 @@ const ScreenController = (function() {
     const updateDisplay = () =>{
         //get the latest version of the board
         const board = GameBoard.getBoard();
+
+        //clear the board display
+        boardElement.textContent = "";
+
+        //render the cells
+        board.forEach((row, rowIdx) => {
+            row.forEach((col, colIdx) => {
+                let cell = document.createElement("button");
+                cell.classList.add("cell");
+                cell.dataset.row = rowIdx;
+                cell.dataset.col = colIdx;
+                cell.textContent = col.getValue();
+                //attach event handler
+                cell.addEventListener("click", clickHandlerCell);
+
+                boardElement.appendChild(cell);
+            });
+        });
+    }
+
+    const startNewGame = () => {
+        const playButton = document.querySelector(".newGameBtn");
+        playButton.addEventListener("click", clickHandlerPlayBtn);
     }
 
     //event listeners for cells
     function clickHandlerCell(e) {
-
+        const cell = e.target;
+        messageElement.textContent = `Cell (${cell.dataset.row}, ${cell.dataset.col}) clicked`;
+        cell.disabled = true;
+        GameController.playRound(cell.dataset.row, cell.dataset.col);
     }
-    //event lister for button
+    //event listener for button
 
     function clickHandlerPlayBtn(e) {
-
+        //let's hard code this for now
+        GameController.startNewGame("X", "O");
+        messageElement.textContent = "Let's play a new game!";
+        updateDisplay();
     }
 
+    startNewGame();
     updateDisplay();
+
 })();
+
+//GameController.startNewGame("X", "O");
+//GameController.playRound(1,1);
