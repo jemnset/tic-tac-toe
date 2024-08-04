@@ -164,91 +164,89 @@ const GameController = (function() {
 
     let players = [];
     const tokens = [1, 2];
+    const GameState = {
+            "PLAY": 1,
+            "WIN": 2,
+            "DRAW": 3};
+   
     let activePlayer = null;
-    
+    let currentGameState = GameState.PLAY;
+
     const getActivePlayer = () => activePlayer;
+    const getGameState = () => currentGameState;
 
-    const switchPlayers = () => {
-        activePlayer === players[0] ? activePlayer = players[1] : activePlayer = players[0];
-    };
-
-    const startNewGame = (...arguments) => {
-
+    const startNewGame = (player1, player2) => {
         //setup new players
-        for(let i=0; i<arguments.length; i++){
-            players[i] = Player(arguments[i], tokens[i]);
-            
-            //console.log(`${players[i].getPlayerName()} playing ${players[i].getPlayerToken()}`);
-        }
+        players[0] = Player(player1, tokens[0]);
+        players[1] = Player(player2, tokens[1]);
 
         activePlayer = players[0];
 
         console.log(`New game: ${players[0].getPlayerName()} vs ${players[1].getPlayerName()}`)
+        
+        currentGameState = GameState.PLAY;
         GameBoard.reset();
         GameBoard.print();
     };
 
     const playRound = (row, col) => {
-        if(activePlayer === null){
-            console.log("Start a new game!")
+
+        console.log(`Player ${activePlayer.getPlayerName()} makes their move!`);
+        GameBoard.placeToken(row, col, activePlayer.getPlayerToken());
+        GameBoard.print();
+
+        //check lines to see if there is three in a row
+        const result = GameBoard.checkLines(row, col, activePlayer.getPlayerToken());
+
+        //active player won
+        if(result === true){
+            console.log(`Congratulations, ${activePlayer.getPlayerName()}! You won!`);
+            currentGameState = GameState.WIN;
+            return;
         }
-        else {
-            console.log(`Player ${activePlayer.getPlayerName()} makes their move!`);
-            GameBoard.placeToken(row, col, activePlayer.getPlayerToken());
-            GameBoard.print();
 
-            //check lines to see if there is three in a row
-            const result = GameBoard.checkLines(row, col, activePlayer.getPlayerToken());
-
-            //active player won
-            if(result === true){
-                console.log(`Congratulations, ${activePlayer.playerName()}! You won!`);
-                reset();
-                return;
-            }
-
-            //no more empty cells and no winner so it's a draw
-            if(GameBoard.hasEmptyCells() === false){
-                console.log("It's a draw!");
-                reset();
-                return;
-            }
-            
-            switchPlayers();
+        //no more empty cells and no winner so it's a draw
+        if(GameBoard.hasEmptyCells() === false){
+            console.log("It's a draw!");
+            currentGameState = GameState.DRAW;
+            return;
         }
+        
+        switchPlayers();
+        currentGameState = GameState.PLAY;
+        
     };
 
-    const reset = () => {
-        GameBoard.reset();
-        players = [];
-        activePlayer = null;
-    }
+    const switchPlayers = () => {
+        activePlayer === players[0] ? activePlayer = players[1] : activePlayer = players[0];
+    };
 
     return {
         getActivePlayer,
         startNewGame,
-        playRound
+        playRound,
+        GameState,
+        getGameState
     }
 })();
 
 //dom rendering object
 //player interacting with dom 
 const ScreenController = (function() {
-    //hard code this for now
     GameController.startNewGame("X", "O");
     const boardElement = document.querySelector(".board");
     const messageElement = document.querySelector(".message");
+    const playButton = document.querySelector(".newGameBtn");
     
-    //create the cells
-    //style the cells
-    //event listener for each cell
     const updateDisplay = () =>{
-        //get the latest version of the board
+        
         const board = GameBoard.getBoard();
+        const gameState = GameController.getGameState();
 
         //clear the board display
         boardElement.textContent = "";
 
+        console.log("gamestate: " +gameState);
         //render the cells
         board.forEach((row, rowIdx) => {
             row.forEach((col, colIdx) => {
@@ -257,27 +255,33 @@ const ScreenController = (function() {
                 cell.dataset.row = rowIdx;
                 cell.dataset.col = colIdx;
                 cell.textContent = col.getValue();
-                //attach event handler
-                cell.addEventListener("click", clickHandlerCell);
+                cell.disabled = true;
+                
+                if(gameState === GameController.GameState.PLAY && col.getValue() === 0)
+                    cell.disabled = false;
 
                 boardElement.appendChild(cell);
             });
         });
     }
 
-    const startNewGame = () => {
-        const playButton = document.querySelector(".newGameBtn");
-        playButton.addEventListener("click", clickHandlerPlayBtn);
-    }
-
     //event listeners for cells
     function clickHandlerCell(e) {
         const cell = e.target;
-        messageElement.textContent = `Cell (${cell.dataset.row}, ${cell.dataset.col}) clicked`;
-        cell.disabled = true;
         GameController.playRound(cell.dataset.row, cell.dataset.col);
+
+        switch(GameController.getGameState()){
+            case GameController.GameState.WIN:
+                messageElement.textContent = `Player ${GameController.getActivePlayer().getPlayerName()} won!`;
+                break;
+            case GameController.GameState.DRAW:
+                messageElement.textContent = `It's a draw!`;
+                break;
+            default:
+                messageElement.textContent = `Player ${GameController.getActivePlayer().getPlayerName()}'s turn`;
+        }     
+        updateDisplay();  
     }
-    //event listener for button
 
     function clickHandlerPlayBtn(e) {
         //let's hard code this for now
@@ -286,10 +290,10 @@ const ScreenController = (function() {
         updateDisplay();
     }
 
-    startNewGame();
+    //setup event listeners
+    playButton.addEventListener("click", clickHandlerPlayBtn);
+    boardElement.addEventListener("click",clickHandlerCell);
+
     updateDisplay();
 
 })();
-
-//GameController.startNewGame("X", "O");
-//GameController.playRound(1,1);
