@@ -237,6 +237,9 @@ const ScreenController = (function() {
     const boardElement = document.querySelector(".board");
     const messageElement = document.querySelector(".message");
     const playButton = document.querySelector(".newGameBtn");
+    const greyColor = getComputedStyle(document.body).getPropertyValue("--grey");
+    const pinkColor = getComputedStyle(document.body).getPropertyValue("--pink");
+    const blueColor = getComputedStyle(document.body).getPropertyValue("--blue");
 
     const updateDisplay = () =>{
         //document.body.appendChild(tokenX);
@@ -257,22 +260,19 @@ const ScreenController = (function() {
 
                 switch(col.getValue()){
                     case 1:
-                        //cell.appendChild(createXToken());
-                        cell.textContent = "X";
+                        cell.appendChild(createXToken());
+                        cell.dataset.token = 1;
                         break;
                     case 2:
-                        //cell.appendChild(createOToken());
-                        cell.textContent = "O";
+                        cell.appendChild(createOToken());
+                        cell.dataset.token = 2;
                         break;
                     default:
-                        cell.textContent = "";
+                        cell.dataset.token = 0;
                         break;
                 }
-                
-                //cell.disabled = true;
-                
-                //if(gameState === GameController.GameState.PLAY && col.getValue() === 0)
-                //    cell.disabled = false
+
+                cell.style.borderColor = greyColor;
                 
                 if(rowIdx === 0)
                     cell.style.borderBottomStyle = "solid";
@@ -294,8 +294,7 @@ const ScreenController = (function() {
     function clickHandlerCell(e) {
         const cell = e.target;
 
-        //console.log(GameController.getGameState());
-        if(GameController.getGameState() === GameController.GameState.PLAY && cell.textContent === ""){
+        if(GameController.getGameState() === GameController.GameState.PLAY && cell.dataset.token === "0"){
             GameController.playRound(cell.dataset.row, cell.dataset.col);
 
             switch(GameController.getGameState()){
@@ -322,7 +321,7 @@ const ScreenController = (function() {
     function createXToken(){
         const crossToken = document.createElementNS("http://www.w3.org/2000/svg","svg");
         crossToken.setAttribute("viewBox", "0 0 460.775 460.775");
-        crossToken.setAttribute("fill", "rgb(227, 59, 128)");
+        crossToken.setAttribute("fill", pinkColor);
         const crossTokenPath = document.createElementNS("http://www.w3.org/2000/svg","path");
         crossTokenPath.setAttributeNS(null, "d", "M285.08,230.397L456.218,59.27c6.076-6.077,6.076-15.911,0-21.986L423.511,4.565c-2.913-2.911-6.866-4.55-10.992-4.55"
             + "c-4.127,0-8.08,1.639-10.993,4.55l-171.138,171.14L59.25,4.565c-2.913-2.911-6.866-4.55-10.993-4.55"
@@ -343,13 +342,13 @@ const ScreenController = (function() {
         circleToken.setAttribute("fill", "none");
         const circleTokenPath = document.createElementNS("http://www.w3.org/2000/svg","path");
         circleTokenPath.setAttributeNS(null, "d", "M21 12C21 16.9706 16.9706 21 12 21C7.02944 21 3 16.9706 3 12C3 7.02944 7.02944 3 12 3C16.9706 3 21 7.02944 21 12Z");
-        circleTokenPath.setAttributeNS(null, "stroke", "rgb(109, 178, 243)");
+        circleTokenPath.setAttributeNS(null, "stroke", blueColor);
         circleTokenPath.setAttributeNS(null, "stroke-width", 2);
         circleTokenPath.setAttributeNS(null, "stroke-linecap", "round");
         circleTokenPath.setAttributeNS(null, "stroke-linejoin", "round");
         circleToken.appendChild(circleTokenPath);
-        circleToken.style.width = "50px";
-        circleToken.style.height = "50px";
+        circleToken.style.width = "65px";
+        circleToken.style.height = "65px";
         return circleToken;
     }
 
