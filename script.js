@@ -237,9 +237,9 @@ const ScreenController = (function() {
     const boardElement = document.querySelector(".board");
     const messageElement = document.querySelector(".message");
     const playButton = document.querySelector(".newGameBtn");
-    
+
     const updateDisplay = () =>{
-        
+        //document.body.appendChild(tokenX);
         const board = GameBoard.getBoard();
         const gameState = GameController.getGameState();
 
@@ -254,11 +254,36 @@ const ScreenController = (function() {
                 cell.classList.add("cell");
                 cell.dataset.row = rowIdx;
                 cell.dataset.col = colIdx;
-                cell.textContent = col.getValue();
-                cell.disabled = true;
+
+                switch(col.getValue()){
+                    case 1:
+                        //cell.appendChild(createXToken());
+                        cell.textContent = "X";
+                        break;
+                    case 2:
+                        //cell.appendChild(createOToken());
+                        cell.textContent = "O";
+                        break;
+                    default:
+                        cell.textContent = "";
+                        break;
+                }
                 
-                if(gameState === GameController.GameState.PLAY && col.getValue() === 0)
-                    cell.disabled = false;
+                //cell.disabled = true;
+                
+                //if(gameState === GameController.GameState.PLAY && col.getValue() === 0)
+                //    cell.disabled = false
+                
+                if(rowIdx === 0)
+                    cell.style.borderBottomStyle = "solid";
+
+                if(rowIdx === 2)
+                    cell.style.borderTopStyle = "solid";
+
+                if(colIdx === 1){
+                    cell.style.borderLeftStyle = "solid";
+                    cell.style.borderRightStyle = "solid";
+                }
 
                 boardElement.appendChild(cell);
             });
@@ -268,19 +293,23 @@ const ScreenController = (function() {
     //event listeners for cells
     function clickHandlerCell(e) {
         const cell = e.target;
-        GameController.playRound(cell.dataset.row, cell.dataset.col);
 
-        switch(GameController.getGameState()){
-            case GameController.GameState.WIN:
-                messageElement.textContent = `Player ${GameController.getActivePlayer().getPlayerName()} won!`;
-                break;
-            case GameController.GameState.DRAW:
-                messageElement.textContent = `It's a draw!`;
-                break;
-            default:
-                messageElement.textContent = `Player ${GameController.getActivePlayer().getPlayerName()}'s turn`;
-        }     
-        updateDisplay();  
+        //console.log(GameController.getGameState());
+        if(GameController.getGameState() === GameController.GameState.PLAY && cell.textContent === ""){
+            GameController.playRound(cell.dataset.row, cell.dataset.col);
+
+            switch(GameController.getGameState()){
+                case GameController.GameState.WIN:
+                    messageElement.textContent = `Player ${GameController.getActivePlayer().getPlayerName()} won!`;
+                    break;
+                case GameController.GameState.DRAW:
+                    messageElement.textContent = `It's a draw!`;
+                    break;
+                default:
+                    messageElement.textContent = `Player ${GameController.getActivePlayer().getPlayerName()}'s turn`;
+            }     
+            updateDisplay();  
+        }
     }
 
     function clickHandlerPlayBtn(e) {
@@ -288,6 +317,40 @@ const ScreenController = (function() {
         GameController.startNewGame("X", "O");
         messageElement.textContent = "Let's play a new game!";
         updateDisplay();
+    }
+
+    function createXToken(){
+        const crossToken = document.createElementNS("http://www.w3.org/2000/svg","svg");
+        crossToken.setAttribute("viewBox", "0 0 460.775 460.775");
+        crossToken.setAttribute("fill", "rgb(227, 59, 128)");
+        const crossTokenPath = document.createElementNS("http://www.w3.org/2000/svg","path");
+        crossTokenPath.setAttributeNS(null, "d", "M285.08,230.397L456.218,59.27c6.076-6.077,6.076-15.911,0-21.986L423.511,4.565c-2.913-2.911-6.866-4.55-10.992-4.55"
+            + "c-4.127,0-8.08,1.639-10.993,4.55l-171.138,171.14L59.25,4.565c-2.913-2.911-6.866-4.55-10.993-4.55"
+            + "c-4.126,0-8.08,1.639-10.992,4.55L4.558,37.284c-6.077,6.075-6.077,15.909,0,21.986l171.138,171.128L4.575,401.505"
+            + "c-6.074,6.077-6.074,15.911,0,21.986l32.709,32.719c2.911,2.911,6.865,4.55,10.992,4.55c4.127,0,8.08-1.639,10.994-4.55"
+            + "l171.117-171.12l171.118,171.12c2.913,2.911,6.866,4.55,10.993,4.55c4.128,0,8.081-1.639,10.992-4.55l32.709-32.719"
+            + "c6.074-6.075,6.074-15.909,0-21.986L285.08,230.397z");
+        crossToken.appendChild(crossTokenPath);
+        crossToken.style.width = "50px";
+        crossToken.style.height = "50px";
+        return crossToken;
+    }
+
+    function createOToken(){
+            //SVGs
+        const circleToken = document.createElementNS("http://www.w3.org/2000/svg","svg");
+        circleToken.setAttribute("viewBox", "0 0 24 24");
+        circleToken.setAttribute("fill", "none");
+        const circleTokenPath = document.createElementNS("http://www.w3.org/2000/svg","path");
+        circleTokenPath.setAttributeNS(null, "d", "M21 12C21 16.9706 16.9706 21 12 21C7.02944 21 3 16.9706 3 12C3 7.02944 7.02944 3 12 3C16.9706 3 21 7.02944 21 12Z");
+        circleTokenPath.setAttributeNS(null, "stroke", "rgb(109, 178, 243)");
+        circleTokenPath.setAttributeNS(null, "stroke-width", 2);
+        circleTokenPath.setAttributeNS(null, "stroke-linecap", "round");
+        circleTokenPath.setAttributeNS(null, "stroke-linejoin", "round");
+        circleToken.appendChild(circleTokenPath);
+        circleToken.style.width = "50px";
+        circleToken.style.height = "50px";
+        return circleToken;
     }
 
     //setup event listeners
