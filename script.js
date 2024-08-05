@@ -233,10 +233,14 @@ const GameController = (function() {
 //dom rendering object
 //player interacting with dom 
 const ScreenController = (function() {
-    GameController.startNewGame("X", "O");
+
+    //DOM elements
     const boardElement = document.querySelector(".board");
     const messageElement = document.querySelector(".message");
     const playButton = document.querySelector(".newGameBtn");
+    const headerElement = document.querySelector(".header");
+    
+    //css colours
     const greyColor = getComputedStyle(document.body).getPropertyValue("--grey");
     const pinkColor = getComputedStyle(document.body).getPropertyValue("--pink");
     const blueColor = getComputedStyle(document.body).getPropertyValue("--blue");
@@ -352,10 +356,17 @@ const ScreenController = (function() {
         return circleToken;
     }
 
+    function setupHeader(){
+        headerElement.querySelector(".player1").prepend(createXToken());
+        headerElement.querySelector(".player2").prepend(createOToken());
+    }
+
     //setup event listeners
     playButton.addEventListener("click", clickHandlerPlayBtn);
     boardElement.addEventListener("click",clickHandlerCell);
-
+    
+    setupHeader();
+    GameController.startNewGame("X", "O");
     updateDisplay();
 
 })();

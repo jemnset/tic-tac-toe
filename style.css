@@ -27,8 +27,33 @@ body{
 
 .header {
     display: flex;
-    justify-content: center;
+    justify-content: space-around;
+    align-items: center;
+    margin-bottom: 20px;
 }
+
+.player1,
+.player2 {
+    display: flex;
+    /*flex-direction: column;*/
+    align-items: center;
+    height: 120px;
+    justify-content: center;
+    gap: 10px;
+}
+
+.player1Name,
+.player2Name {
+    font-size: 14pt;
+    color: var(--grey);
+    width: 150px;
+    text-align: center;
+    border-style: none;
+}
+
+/*input[type='text']:focus{
+    outline: 1px solid var(--grey);
+}*/
 
 .board{
     height: 600px;
