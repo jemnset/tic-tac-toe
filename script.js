@@ -64,7 +64,7 @@ const GameBoard = (function() {
             row.forEach((cell) => {
                 rowString += (cell.getValue()) + " ";
             });
-            console.log(rowString);
+            //console.log(rowString);
         });
     };
 
@@ -182,32 +182,32 @@ const GameController = (function() {
 
         activePlayer = players[0];
 
-        console.log(`New game: ${players[0].getPlayerName()} vs ${players[1].getPlayerName()}`)
+        //console.log(`New game: ${players[0].getPlayerName()} vs ${players[1].getPlayerName()}`)
         
         currentGameState = GameState.PLAY;
         GameBoard.reset();
-        GameBoard.print();
+        //GameBoard.print();
     };
 
     const playRound = (row, col) => {
 
-        console.log(`Player ${activePlayer.getPlayerName()} makes their move!`);
+        //console.log(`Player ${activePlayer.getPlayerName()} makes their move!`);
         GameBoard.placeToken(row, col, activePlayer.getPlayerToken());
-        GameBoard.print();
+        //GameBoard.print();
 
         //check lines to see if there is three in a row
         const result = GameBoard.checkLines(row, col, activePlayer.getPlayerToken());
 
         //active player won
         if(result === true){
-            console.log(`Congratulations, ${activePlayer.getPlayerName()}! You won!`);
+            //console.log(`Congratulations, ${activePlayer.getPlayerName()}! You won!`);
             currentGameState = GameState.WIN;
             return;
         }
 
         //no more empty cells and no winner so it's a draw
         if(GameBoard.hasEmptyCells() === false){
-            console.log("It's a draw!");
+            //console.log("It's a draw!");
             currentGameState = GameState.DRAW;
             return;
         }
@@ -239,6 +239,16 @@ const ScreenController = (function() {
     const messageElement = document.querySelector(".message");
     const playButton = document.querySelector(".newGameBtn");
     const headerElement = document.querySelector(".header");
+    const headerPlayer1NameElem = headerElement.querySelector(".player1Name");
+    const headerPlayer2NameElem = headerElement.querySelector(".player2Name");
+    
+    //dialog DOM elements
+    const playersDialog = document.querySelector(".playersDialog");
+    const playersFormBody = document.querySelector(".playersFormBody");
+    const player1FormInput = document.querySelector(".player1FormName");
+    const player2FormInput = document.querySelector(".player2FormName");
+    const cancelBtn = document.querySelector(".cancelBtn");
+    const confirmBtn = document.querySelector(".confirmBtn");
     
     //css colours
     const greyColor = getComputedStyle(document.body).getPropertyValue("--grey");
@@ -253,7 +263,7 @@ const ScreenController = (function() {
         //clear the board display
         boardElement.textContent = "";
 
-        console.log("gamestate: " +gameState);
+        //console.log("gamestate: " +gameState);
         //render the cells
         board.forEach((row, rowIdx) => {
             row.forEach((col, colIdx) => {
@@ -303,21 +313,37 @@ const ScreenController = (function() {
 
             switch(GameController.getGameState()){
                 case GameController.GameState.WIN:
-                    messageElement.textContent = `Player ${GameController.getActivePlayer().getPlayerName()} won!`;
+                    messageElement.textContent = `${GameController.getActivePlayer().getPlayerName()} won!`;
                     break;
                 case GameController.GameState.DRAW:
                     messageElement.textContent = `It's a draw!`;
                     break;
                 default:
-                    messageElement.textContent = `Player ${GameController.getActivePlayer().getPlayerName()}'s turn`;
+                    messageElement.textContent = `${GameController.getActivePlayer().getPlayerName()}'s turn`;
             }     
             updateDisplay();  
         }
     }
 
     function clickHandlerPlayBtn(e) {
-        //let's hard code this for now
-        GameController.startNewGame("X", "O");
+        playersDialog.showModal();
+    }
+
+    function clickHandlerCancelBtn(e) {
+        e.preventDefault();
+        player1FormInput.value = headerPlayer1NameElem.textContent;
+        player2FormInput.value = headerPlayer2NameElem.textContent;
+        playersDialog.close();
+    }
+
+    function clickHandlerConfirmBtn(e) {
+        let player1Name = (player1FormInput.value.trim() === "") ? "Player 1" : player1FormInput.value.trim();
+        let player2Name = (player2FormInput.value.trim() === "") ? "Player 2" : player2FormInput.value.trim();
+
+        headerPlayer1NameElem.textContent = player1Name;
+        headerPlayer2NameElem.textContent = player2Name;
+
+        GameController.startNewGame(player1Name, player2Name);
         messageElement.textContent = "Let's play a new game!";
         updateDisplay();
     }
@@ -340,7 +366,6 @@ const ScreenController = (function() {
     }
 
     function createOToken(){
-            //SVGs
         const circleToken = document.createElementNS("http://www.w3.org/2000/svg","svg");
         circleToken.setAttribute("viewBox", "0 0 24 24");
         circleToken.setAttribute("fill", "none");
@@ -356,17 +381,21 @@ const ScreenController = (function() {
         return circleToken;
     }
 
-    function setupHeader(){
-        headerElement.querySelector(".player1").prepend(createXToken());
-        headerElement.querySelector(".player2").prepend(createOToken());
-    }
-
     //setup event listeners
     playButton.addEventListener("click", clickHandlerPlayBtn);
     boardElement.addEventListener("click",clickHandlerCell);
+
+    //dialog box event listeners
+    cancelBtn.addEventListener("click", clickHandlerCancelBtn);
+    confirmBtn.addEventListener("click", clickHandlerConfirmBtn);
     
-    setupHeader();
-    GameController.startNewGame("X", "O");
+    //setup SVGs
+    headerElement.querySelector(".player1").prepend(createXToken());
+    headerElement.querySelector(".player2").prepend(createOToken());
+    playersFormBody.insertBefore(createXToken(), player1FormInput);
+    playersFormBody.insertBefore(createOToken(), player2FormInput);
+
+    playersDialog.showModal();
     updateDisplay();
 
 })();
